@@ -6,34 +6,108 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/amadeus")
+@CrossOrigin(origins = "http://localhost:3000")
 public class AmadeusController {
+
+    private final RestTemplate restTemplate = new RestTemplate();
+
     @Value("${amadeus.client-id}")
     private String clientId;
 
     @Value("${amadeus.client-secret}")
     private String clientSecret;
 
-    private final RestTemplate restTemplate = new RestTemplate();
     private String accessToken;
     private long tokenExpirationTime;
     private final String tokenUrl = "https://test.api.amadeus.com/v1/security/oauth2/token";
-
 
     @GetMapping("/")
     public String hello() {
         return "Hello World Travel!";
     }
 
+    @GetMapping("/locations")
+    public ResponseEntity<String> getLocations(@RequestParam String subtype, @RequestParam String keyword, @RequestParam String countryCode) {
+        String token = getAccessToken();
+
+        String url = String.format(
+                "https://test.api.amadeus.com/v1/reference-data/locations?subType=%s&keyword=%s&countryCode=%s",
+                subtype, keyword, countryCode
+        );
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                request,
+                String.class
+        );
+
+        return ResponseEntity.ok(response.getBody());
+    }
+
+    @GetMapping("/locationsById")
+    public ResponseEntity<String> getLocationsById(@RequestParam String locationId) {
+        String token = getAccessToken();
+
+        String url = String.format(
+                "https://test.api.amadeus.com/v1/reference-data/locations/%s",
+                locationId
+        );
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                request,
+                String.class
+        );
+
+        return ResponseEntity.ok(response.getBody());
+    }
+
+    @GetMapping("/airlines")
+    public ResponseEntity<String> getAirlines(@RequestParam String airlineCodes) {
+        String token = getAccessToken();
+
+        String url = String.format(
+                "https://test.api.amadeus.com/v1/reference-data/airlines?airlineCodes=%s",
+                airlineCodes
+        );
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                request,
+                String.class
+        );
+
+        return ResponseEntity.ok(response.getBody());
+    }
+
     @GetMapping("/flights")
     public ResponseEntity<String> getFlights(@RequestParam String origin, @RequestParam String destination, @RequestParam String departureDate, @RequestParam String adults) {
+
         String token = getAccessToken();
 
         String url = String.format(
@@ -100,5 +174,4 @@ public class AmadeusController {
             throw new RuntimeException("Error while retrieving access token: " + e.getMessage(), e);
         }
     }
-
 }
