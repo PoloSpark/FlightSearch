@@ -1,127 +1,125 @@
 import React, { useState } from "react";
-import { FormControl, Input, InputLabel, Select, MenuItem, FormGroup, FormControlLabel, Checkbox, Button, SelectChangeEvent } from '@mui/material';
-import '../index.css'
+import { FormControl, InputLabel, Select, MenuItem, Checkbox, Button, TextField, FormControlLabel, Box } from '@mui/material';
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { TextField } from "@mui/material";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 import { useNavigate } from 'react-router-dom';
 
 export default function Search() {
-    const [origin, setOrigin] = useState('');
-    const [destination, setDestination] = useState('');
-    const [currency, setCurrency] = useState('');
-    const [departure, setDeparture] = useState<Dayjs | null>(dayjs('2024-11-25'));
-    const [returnal, setReturnal] = useState<Dayjs | null>(dayjs('2024-11-25'));
     const navigate = useNavigate();
+    const [formData, setFormData] = useState({
+        origin: '',
+        destination: '',
+        currency: '',
+        departure: dayjs(),
+        returnal: dayjs().add(1, 'day'),
+        adults: 1,
+        nonstop: true,
+    });
+
+    const handleFormChange = (field: string, value: any) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
+    };
 
     const handleNavigation = () => {
-        
-        navigate('/flights');
-    };
+        const { origin, destination, currency, departure, returnal, adults, nonstop } = formData;
 
-    // Form Setters
-    const handleOrigin = (event: SelectChangeEvent) => {
-        setOrigin(event.target.value as string);
-    };
-    const handleDestination = (event: SelectChangeEvent) => {
-        setDestination(event.target.value as string);
-    };
-    const handleCurrency = (event: SelectChangeEvent) => {
-        setCurrency(event.target.value as string);
+        const formattedDeparture = departure.format('YYYY-MM-DD');
+        const formattedReturnal = returnal.format('YYYY-MM-DD');
+
+        if (!origin || !destination || !formattedDeparture || !formattedReturnal) {
+            alert("Please fill in all required fields!");
+            return;
+        }
+
+        navigate('/flights', { state: { origin, destination, currency, departure: formattedDeparture, returnal: formattedReturnal, adults, nonstop } });
     };
 
     return (
-        <div>
-            <h1 className="searchTitle">Flight Search</h1>
+        <Box sx={{ maxWidth: 600, mx: 'auto', mt: 4 }}>
+            <h1>Flight Search</h1>
 
-            <div className="searchPage">
-                <FormControl variant="filled" sx={{ m: 1, minWidth: 480 }}>
-                    <InputLabel>Departure Airport</InputLabel>
-                    <Select
-                        value={origin}
-                        label="Departure Airport"
-                        onChange={handleOrigin}
-                    >
-                        <MenuItem value={'JFK'}>JFK</MenuItem>
-                        <MenuItem value={'LAX'}>LAX</MenuItem>
-                        <MenuItem value={'ORD'}>ORD</MenuItem>
-                    </Select>
-                </FormControl>
-            </div>
+            <FormControl fullWidth sx={{ mb: 2 }}>
+                <InputLabel>Departure Airport</InputLabel>
+                <Select
+                    value={formData.origin}
+                    onChange={(e) => handleFormChange('origin', e.target.value)}
+                >
+                    <MenuItem value="JFK">JFK</MenuItem>
+                    <MenuItem value="LAX">LAX</MenuItem>
+                    <MenuItem value="ORD">ORD</MenuItem>
+                </Select>
+            </FormControl>
 
-            <div className="searchPage">
-                <FormControl variant="filled" sx={{ m: 1, minWidth: 480 }}>
-                    <InputLabel >Arrival Airport</InputLabel>
-                    <Select
-                        value={destination}
-                        label="Arrival Airport"
-                        onChange={handleDestination}
-                    >
-                        <MenuItem value={'JFK'}>JFK</MenuItem>
-                        <MenuItem value={'LAX'}>LAX</MenuItem>
-                        <MenuItem value={'ORD'}>ORD</MenuItem>
-                    </Select>
-                </FormControl>
-            </div>
+            <FormControl fullWidth sx={{ mb: 2 }}>
+                <InputLabel>Arrival Airport</InputLabel>
+                <Select
+                    value={formData.destination}
+                    onChange={(e) => handleFormChange('destination', e.target.value)}
+                >
+                    <MenuItem value="JFK">JFK</MenuItem>
+                    <MenuItem value="LAX">LAX</MenuItem>
+                    <MenuItem value="ORD">ORD</MenuItem>
+                </Select>
+            </FormControl>
 
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                    label="Departure Date"
+                    value={formData.departure}
+                    onChange={(newValue) => handleFormChange('departure', newValue)}
+                    sx={{ mb: 2, width: '100%' }}
+                />
+                <DatePicker
+                    label="Return Date"
+                    value={formData.returnal}
+                    onChange={(newValue) => {
+                        if (newValue?.isBefore(formData.departure)) {
+                            alert("Return date cannot be before departure date!");
+                            return;
+                        }
+                        handleFormChange('returnal', newValue);
+                    }}
+                    sx={{ mb: 2, width: '100%' }}
+                />
+            </LocalizationProvider>
 
-            <div className="searchPage">
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DatePicker
-                        label="Departure date"
-                        value={departure}
-                        onChange={(newValue) => setDeparture(newValue)}
-                        sx={{ m: 1, minWidth: 480 }}
+            <FormControl fullWidth sx={{ mb: 2 }}>
+                <InputLabel>Currency</InputLabel>
+                <Select
+                    value={formData.currency}
+                    onChange={(e) => handleFormChange('currency', e.target.value)}
+                >
+                    <MenuItem value="USD">USD</MenuItem>
+                    <MenuItem value="MXN">MXN</MenuItem>
+                    <MenuItem value="EUR">EUR</MenuItem>
+                </Select>
+            </FormControl>
+
+            <TextField
+                label="Number of Adults"
+                type="number"
+                value={formData.adults}
+                onChange={(e) => handleFormChange('adults', parseInt(e.target.value, 10) || 1)}
+                inputProps={{ min: 1 }}
+                fullWidth
+                sx={{ mb: 2 }}
+            />
+
+            <FormControlLabel
+                control={
+                    <Checkbox
+                        checked={formData.nonstop}
+                        onChange={(e) => handleFormChange('nonstop', e.target.checked)}
                     />
-                </LocalizationProvider>
-            </div>
+                }
+                label="Non-stop"
+                sx={{ mb: 2 }}
+            />
 
-            <div className="searchPage">
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DatePicker
-                        label="Return date"
-                        value={returnal}
-                        onChange={(newValue) => setReturnal(newValue)}
-                        sx={{ m: 1, minWidth: 480 }}
-                    />
-                </LocalizationProvider>
-            </div>
-
-            <div className="searchPage">
-                <FormControl variant="filled" sx={{ m: 1, minWidth: 480 }}>
-                    <InputLabel >Currency</InputLabel>
-                    <Select
-                        value={currency}
-                        label="Currency"
-                        onChange={handleCurrency}
-                    >
-                        <MenuItem value={'USD'}>USD</MenuItem>
-                        <MenuItem value={'MXN'}>MXN</MenuItem>
-                        <MenuItem value={'EUR'}>EUR</MenuItem>
-                    </Select>
-                </FormControl>
-            </div>
-
-            <div className="searchPage">
-                <FormControl variant="filled" sx={{ m: 1, minWidth: 360 }}>
-                    <TextField
-                        required
-                        id="outlined-required"
-                        label="Number of Adults"
-                        defaultValue="1"
-                        sx={{ m: 1, minWidth: 240 }}
-                    />
-                </FormControl>
-
-                <FormControl variant="filled" sx={{ m: 1 }}>
-                    <FormControlLabel control={<Checkbox defaultChecked />} label="Non-stop" />
-                </FormControl>
-            </div>
-
-            <div className="searchPage">
-                <Button variant="contained" onClick={handleNavigation}>Search</Button>
-            </div>
-        </div>
+            <Button variant="contained" fullWidth onClick={handleNavigation}>
+                Search
+            </Button>
+        </Box>
     );
 }

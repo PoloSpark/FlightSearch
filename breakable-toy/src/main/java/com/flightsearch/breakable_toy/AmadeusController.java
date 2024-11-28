@@ -8,8 +8,10 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/amadeus")
@@ -34,12 +36,12 @@ public class AmadeusController {
     }
 
     @GetMapping("/locations")
-    public ResponseEntity<String> getLocations(@RequestParam String subtype, @RequestParam String keyword, @RequestParam String countryCode) {
+    public ResponseEntity<String> getLocations(@RequestParam String subtype, @RequestParam String keyword) {
         String token = getAccessToken();
 
         String url = String.format(
-                "https://test.api.amadeus.com/v1/reference-data/locations?subType=%s&keyword=%s&countryCode=%s",
-                subtype, keyword, countryCode
+                "https://test.api.amadeus.com/v1/reference-data/locations?subType=%s&keyword=%s",
+                subtype, keyword
         );
 
         HttpHeaders headers = new HttpHeaders();
@@ -106,14 +108,26 @@ public class AmadeusController {
     }
 
     @GetMapping("/flights")
-    public ResponseEntity<String> getFlights(@RequestParam String origin, @RequestParam String destination, @RequestParam String departureDate, @RequestParam String adults) {
+    public ResponseEntity<String> getFlights(@RequestParam String origin, @RequestParam String destination, @RequestParam String departureDate, @RequestParam Optional<String> returnDate, @RequestParam(defaultValue = "false") boolean nonStop, @RequestParam String adults, @RequestParam Optional<String> currencyCode) {
 
         String token = getAccessToken();
 
-        String url = String.format(
-                "https://test.api.amadeus.com/v2/shopping/flight-offers?originLocationCode=%s&destinationLocationCode=%s&departureDate=%s&adults=%s",
-                origin, destination, departureDate, adults
-        );
+
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl("https://test.api.amadeus.com/v2/shopping/flight-offers?")
+                .queryParam("originLocationCode", origin)
+                .queryParam("destinationLocationCode", destination)
+                .queryParam("departureDate", departureDate)
+                .queryParam("adults", adults);
+
+        returnDate.ifPresent(date -> uriBuilder.queryParam("returnDate", date));
+
+        if (nonStop) {
+            uriBuilder.queryParam("nonStop", true);
+        }
+
+        currencyCode.ifPresent(currency -> uriBuilder.queryParam("currencyCode", currency));
+
+        String url = uriBuilder.toUriString();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(token);

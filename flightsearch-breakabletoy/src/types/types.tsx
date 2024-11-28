@@ -1,4 +1,4 @@
-export interface Types {
+export interface AmadeusResponse {
     meta:         Meta;
     data:         Datum[];
     dictionaries: Dictionaries;

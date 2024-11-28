@@ -1,35 +1,18 @@
 import { Box, Button, ThemeProvider } from "@mui/material";
 import { purple } from "@mui/material/colors";
+import { AmadeusResponse, Datum } from "../types/types";
+import ResultItem from "./resultItem";
 
-export default function Result() {
+export default function Result(props: AmadeusResponse) {
     return (
         <div>
-            <ThemeProvider
-                theme={{
-                    palette: {
-                        primary: {
-                            main: '#FFFFFF',
-                            dark: '#D1D1D1',
-                        },
-                    },
-                }}
-            >
-                <Box
-                    sx={{
-                        height: 150,
-                        border: 1,
-                        borderWidth: 1,
-                        borderColor: '#000000',
-                        bgcolor: 'primary.main',
-                        '&:hover': {
-                            bgcolor: 'primary.dark',
-                        },
-                    }}
-                >
-
-
-                </Box>
-            </ThemeProvider>
+            {
+                props.data.map((s, index) => (
+                    <div className="flightsPage">
+                        <ResultItem key={index} {...s as Datum} />
+                    </div>
+                ))
+            }
         </div>
     )
 }
