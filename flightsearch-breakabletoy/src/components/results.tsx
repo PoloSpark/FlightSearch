@@ -3,13 +3,23 @@ import { purple } from "@mui/material/colors";
 import { AmadeusResponse, Datum } from "../types/types";
 import ResultItem from "./resultItem";
 
-export default function Result(props: AmadeusResponse) {
+export interface resultProps {
+    arrival: string,
+    departure: string,
+    data: AmadeusResponse
+}
+
+export default function Result({arrival, departure, data}: resultProps) {
+
+    
+
     return (
         <div>
+
             {
-                props.data.map((s, index) => (
+                data.data.map((s, index) => (
                     <div className="flightsPage">
-                        <ResultItem key={index} {...s as Datum} />
+                        <ResultItem key={index} arrival={arrival} departure={departure} data={s} />
                     </div>
                 ))
             }

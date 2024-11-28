@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useEffect, useState } from "react";
 import { AmadeusResponse } from "../types/types";
 import Result from "./results";
+import { AmadeusLocations } from "../types/names";
 
 
 
@@ -14,9 +15,9 @@ export default function Flights() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    /*
+    
     const [dep, setDep] = useState<string>("");
-    const [iarr, setIarr] = useState<string>("");*/
+    const [arr, setArr] = useState<string>("");
 
     const { origin, destination, currency, departure, returnal, adults, nonstop } = location.state || {};
 
@@ -29,16 +30,17 @@ export default function Flights() {
             const data = (await axios.get<AmadeusResponse>('http://localhost:8080/amadeus/flights?origin=' + origin + '&destination=' + destination + '&departureDate=' + departure + '&returnDate=' + returnal + '&nonStop=' + nonstop + '&adults=' + adults + '&currencyCode=' + currency)).data;
             setData(data)
 
-            /*
+            
             const [dataDep, dataArr] = await Promise.all([
                 axios.get<AmadeusLocations>(`http://localhost:8080/amadeus/locations?subtype=AIRPORT&keyword=${origin}`),
                 axios.get<AmadeusLocations>(`http://localhost:8080/amadeus/locations?subtype=AIRPORT&keyword=${destination}`),
             ]);
 
             setDep(dataDep.data.data[0]?.name || "Unknown");
-            setIarr(dataArr.data.data[0]?.name || "Unknown");
+            setArr(dataArr.data.data[0]?.name || "Unknown");
 
-            */
+            
+
             setLoading(false);
         } catch (err) {
             setError('Failed to fetch data');
@@ -68,7 +70,7 @@ export default function Flights() {
             </div>
 
             <div className="flightsPage">
-                <Result {...data as AmadeusResponse}/>
+                <Result arrival={arr} departure={dep} data={data as AmadeusResponse}/>
             </div>
 
         </div>

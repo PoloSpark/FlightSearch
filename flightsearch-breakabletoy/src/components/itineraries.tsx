@@ -6,9 +6,11 @@ export default function Itineraries(props: Itinerary) {
 
     return (
         <div>
-            {
-                props.duration
-            }
+            {props.segments.map((s) => (
+                <div>
+                    <Segments {...s as Segment}/>
+                </div>
+            ))}
         </div>
     )
 }
