@@ -30,7 +30,7 @@ export default function Details() {
     return (
         <div className="flightsPage">
             <Button variant="outlined" onClick={handleNavigation}>Get Back to Search</Button>
-            <div className="flex-container">
+            <div className="grid-container">
                 <div>
                     {itineraries.map((s) => (
                         <Itineraries {...s as Itinerary} />
@@ -47,9 +47,31 @@ export default function Details() {
                                 borderColor: "#000000",
                                 bgcolor: "primary.main",
                                 "&:hover": { bgcolor: "primary.dark", cursor: "pointer" },
+                                padding: "5%"
                             }}
                         >
-                            {`${price.base}`}
+                            <p>
+                                Price Breakdown:
+                            </p>
+
+                            <p>
+                                Base: {`${price.base} ${price.currency}`}
+                            </p>
+
+                            <p>
+                                Fees:
+                                
+                                {price.fees.map((s) => (
+                                    <div>
+                                        {`${s.type}: ${s.amount} ${price.currency}`}
+                                    </div>
+                                ))}
+                            </p>
+
+                            <p>
+                                Total: {`${price.total} ${price.currency}`}
+                            </p>
+
                         </Box>
                     </ThemeProvider>
                 </div>

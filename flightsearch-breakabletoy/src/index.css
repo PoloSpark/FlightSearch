@@ -50,10 +50,20 @@ code {
   align-items: center;
 }
 
-.flex-container {
+.grid-container {
   display: grid;
   grid-template-columns: 75% 25%;
   padding: 2%;
   column-gap: 1%;
   row-gap: 1%;
+}
+
+.flex {
+  display: grid;
+  grid-template-columns: 50% 25% 25%;
+  align-items: center;
+}
+
+.flex-item {
+  padding: 2%;
 }

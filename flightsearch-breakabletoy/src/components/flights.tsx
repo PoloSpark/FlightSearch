@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { AmadeusResponse } from "../types/types";
 import Result from "./results";
 import { AmadeusLocations } from "../types/names";
+import { AmadeusAirlines } from "../types/airlines";
 
 
 
@@ -18,6 +19,8 @@ export default function Flights() {
     
     const [dep, setDep] = useState<string>("");
     const [arr, setArr] = useState<string>("");
+
+    const [airline, setAirline] = useState("");
 
     const { origin, destination, currency, departure, returnal, adults, nonstop } = location.state || {};
 
@@ -39,7 +42,9 @@ export default function Flights() {
             setDep(dataDep.data.data[0]?.name || "Unknown");
             setArr(dataArr.data.data[0]?.name || "Unknown");
 
-            
+            const dataAirline = (await axios.get<AmadeusAirlines>(`http://localhost:8080/amadeus/airlines?airlineCodes=${data.data[0].validatingAirlineCodes}`)).data;
+
+            setAirline(dataAirline.data[0]?.businessName || "Unknown");
 
             setLoading(false);
         } catch (err) {
@@ -70,7 +75,7 @@ export default function Flights() {
             </div>
 
             <div className="flightsPage">
-                <Result arrival={arr} departure={dep} data={data as AmadeusResponse}/>
+                <Result airline={airline} arrival={arr} departure={dep} data={data as AmadeusResponse}/>
             </div>
 
         </div>
