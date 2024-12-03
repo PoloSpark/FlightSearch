@@ -147,7 +147,6 @@ public class AmadeusController {
     public String getAccessToken() {
         try {
             if (accessToken != null && System.currentTimeMillis() < tokenExpirationTime) {
-                //System.out.println("Returning cached token: " + accessToken);
                 return accessToken;
             }
 
@@ -168,7 +167,6 @@ public class AmadeusController {
                     String.class
             );
 
-            //System.out.println("Token Response: " + response.getBody());
 
             if (response.getStatusCode() == HttpStatus.OK) {
                 JsonNode jsonResponse = new ObjectMapper().readTree(response.getBody());
@@ -178,7 +176,6 @@ public class AmadeusController {
                 this.accessToken = newAccessToken;
                 this.tokenExpirationTime = System.currentTimeMillis() + (expiresIn * 1000);
 
-                //System.out.println("New access token: " + newAccessToken);
                 return newAccessToken;
             } else {
                 throw new RuntimeException("Failed to retrieve access token. Status: " + response.getStatusCode());

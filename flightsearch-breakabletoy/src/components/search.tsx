@@ -45,9 +45,9 @@ export default function Search() {
                     value={formData.origin}
                     onChange={(e) => handleFormChange('origin', e.target.value)}
                 >
-                    <MenuItem value="JFK">JFK</MenuItem>
-                    <MenuItem value="LAX">LAX</MenuItem>
-                    <MenuItem value="ORD">ORD</MenuItem>
+                    <MenuItem value="JFK">New York</MenuItem>
+                    <MenuItem value="LAX">Los Angeles</MenuItem>
+                    <MenuItem value="ORD">Chicago</MenuItem>
                 </Select>
             </FormControl>
 
@@ -57,9 +57,9 @@ export default function Search() {
                     value={formData.destination}
                     onChange={(e) => handleFormChange('destination', e.target.value)}
                 >
-                    <MenuItem value="JFK">JFK</MenuItem>
-                    <MenuItem value="LAX">LAX</MenuItem>
-                    <MenuItem value="ORD">ORD</MenuItem>
+                    <MenuItem value="JFK">New York</MenuItem>
+                    <MenuItem value="LAX">Los Angeles</MenuItem>
+                    <MenuItem value="ORD">Chicago</MenuItem>
                 </Select>
             </FormControl>
 
